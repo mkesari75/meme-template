@@ -28,7 +28,7 @@ const VideoMeme = (props) => {
       setIsLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:4000/video?q=${props.searchValue}`
+          `https://meme-template-mern.herokuapp.com/video?q=${props.searchValue}`
         );
         setVideo(res.data);
       } catch (err) {

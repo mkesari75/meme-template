@@ -3,3 +3,4 @@
 /api/.env
 #Client files not included
 /client/node_modules
+/client/build

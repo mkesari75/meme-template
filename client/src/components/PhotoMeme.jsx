@@ -29,7 +29,7 @@ const PhotoMeme = (props) => {
 
       try {
         const res = await axios.get(
-          `http://localhost:4000/photo?q=${props.searchValue}`
+          `https://meme-template-mern.herokuapp.com/photo?q=${props.searchValue}`
         );
         setPhoto(res.data);
         //As soon as data fetched sending number of elements to parent to disable showmore

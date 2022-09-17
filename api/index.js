@@ -1,10 +1,12 @@
-require("dotenv").config();
 //IMPORTS
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 4000;
+const path = require("path");
+const PORT = process.env.PORT || 4000;
+
+require("dotenv").config({ path: __dirname + "/.env" });
 
 //MIDDLEWARES
 app.use(cors());
@@ -40,9 +42,20 @@ const MemeSchema = new mongoose.Schema(
 const photoMeme = mongoose.model("photoMeme", MemeSchema);
 const videoMeme = mongoose.model("videoMeme", MemeSchema);
 
-app.get("/", (req, res) => {
-  res.send("Welcome to Server of All India Meme");
-});
+// --------------------------DEPLOYMENT--------------------------
+const __dirname1 = path.resolve();
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/client/build")));
+
+  app.get("/", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "client", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("Welcome to Server of All India Meme");
+  });
+}
+// --------------------------DEPLOYMENT--------------------------
 
 app.get("/photo", (req, res) => {
   const { q } = req.query;
@@ -76,6 +89,6 @@ app.get("/video", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-app.listen(port, () => {
-  console.log("Server started at port 4000");
+app.listen(PORT, () => {
+  console.log("Server started at port " + PORT);
 });
