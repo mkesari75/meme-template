@@ -1,6 +1,7 @@
 #Api files not included
 /api/node_modules
 /api/.env
+
 #Client files not included
 /client/node_modules
 /client/build
