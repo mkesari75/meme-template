@@ -4,7 +4,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 4000;
 
 //MIDDLEWARES
 app.use(cors());
@@ -76,6 +75,6 @@ app.get("/video", (req, res) => {
     .catch((err) => console.log(err));
 });
 
-app.listen(port, () => {
+app.listen(process.env.PORT || 4000, () => {
   console.log("Server started at port 4000");
 });
