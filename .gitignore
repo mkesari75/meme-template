@@ -4,3 +4,6 @@
 
 #Client files not included
 /client/node_modules
+
+#Adimn files not included
+/admin/node_modules
