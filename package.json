@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/mkesari75/meme-template/issues"
   },
-  "homepage": "https://github.com/mkesari75/meme-template#readme"
+  "homepage": "https://github.com/mkesari75/meme-template#readme",
+  "dependencies": {
+    "react-icons": "^4.7.1"
+  }
 }

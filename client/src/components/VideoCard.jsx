@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import { IoIosShareAlt } from "react-icons/io";
 import axios from "axios";
 import fileDownload from "js-file-download";
 import ReactPlayer from "react-player";
 import { mobile } from "../resources/mobile";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  FacebookShareButton,
+  FacebookIcon,
+  WhatsappShareButton,
+  WhatsappIcon,
+  TwitterShareButton,
+  TwitterIcon,
+} from "react-share";
 
 const Container = styled.div`
+  position: relative;
   margin-top: 50px;
   width: 360px;
   margin-bottom: 45px;
@@ -90,6 +100,33 @@ const Tag = styled.div`
   font-size: 10px;
 `;
 
+const ShareContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  display: ${(props) => props.displayIcon};
+`;
+
+const Share = styled.div`
+  height: auto;
+  width: auto;
+  position: absolute;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 51%;
+  background-color: white;
+  border-radius: 50px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+`;
+
+const ShareIcon = styled.div`
+  padding: 5px;
+  transition: all 0.25s ease;
+  &:hover {
+    scale: 1.1;
+  }
+`;
+
 const VideoCard = (props) => {
   const [clicked, setClicked] = useState(false);
 
@@ -121,9 +158,69 @@ const VideoCard = (props) => {
       });
   };
 
+  //for setting the share icon and toggling it to display on click of the shareicon
+  const [displayShareIcon, setDisplayShareIcon] = useState("none");
+  const [toggleShareIcon, setToggleShareIcon] = useState(true);
+
+  //for handling share icon i.e whatsapp, facebook
+  const handleDisplay = () => {
+    setToggleShareIcon(!toggleShareIcon);
+    toggleShareIcon ? setDisplayShareIcon("") : setDisplayShareIcon("none");
+  };
+
+  //for handling share count
+  let [shareCount, setShareCount] = useState(0);
+  const handleShareCount = () => {
+    setShareCount((prev) => prev + 1);
+  };
+  useEffect(() => {
+    console.log(shareCount);
+  }, [shareCount]);
+
+  const url = "http://localhost:3000/getsharedvideomeme?id=" + props.id;
   return (
     <>
       <Container key={props.id}>
+        <ShareContainer displayIcon={displayShareIcon}>
+          <Share>
+            <TwitterShareButton
+              url={url}
+              title="Hey! checkout this amazing meme"
+            >
+              <ShareIcon>
+                <TwitterIcon
+                  size={40}
+                  round={true}
+                  onClick={handleShareCount}
+                />
+              </ShareIcon>
+            </TwitterShareButton>
+
+            <WhatsappShareButton
+              url={url}
+              title="Hey! checkout this amazing meme"
+            >
+              <ShareIcon>
+                <WhatsappIcon
+                  size={40}
+                  round={true}
+                  onClick={handleShareCount}
+                />
+              </ShareIcon>
+            </WhatsappShareButton>
+
+            <FacebookShareButton url={url} quote="Hey! checkout this meme">
+              <ShareIcon>
+                <FacebookIcon
+                  size={40}
+                  round={true}
+                  onClick={handleShareCount}
+                />
+              </ShareIcon>
+            </FacebookShareButton>
+          </Share>
+        </ShareContainer>
+
         <Video>
           <ReactPlayer url={props.url} height="202px" width="100%" controls />
         </Video>
@@ -155,8 +252,21 @@ const VideoCard = (props) => {
             >
               <ArrowDownwardIcon />
             </Icon>
+            <Icon
+              hover="#04D932"
+              borderColor="#04D932"
+              style={{ marginLeft: "10px" }}
+            >
+              <IoIosShareAlt
+                style={{ scale: "1.5" }}
+                onClick={() => {
+                  handleDisplay();
+                }}
+              />
+            </Icon>
           </Icons>
         </Details>
+
         <CounterContainer>
           <Counter type="likes" style={{ color: "#d90429" }}>
             {Math.abs(props.likes) > 999
@@ -175,7 +285,18 @@ const VideoCard = (props) => {
                 "k"
               : Math.sign(props.downloads) * Math.abs(props.downloads)}
           </Counter>
+          <Counter
+            type="share"
+            style={{ marginLeft: "10px", color: "#04D932" }}
+          >
+            {Math.abs(props.downloads) > 999
+              ? Math.sign(props.downloads) *
+                  (Math.abs(props.downloads) / 1000).toFixed(1) +
+                "k"
+              : Math.sign(props.downloads) * Math.abs(props.downloads)}
+          </Counter>
         </CounterContainer>
+
         <ToastContainer />
       </Container>
     </>

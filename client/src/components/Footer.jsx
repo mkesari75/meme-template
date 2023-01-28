@@ -81,7 +81,7 @@ const Footer = () => {
         </Section1>
         <Section2>
           <Link>Latest</Link>
-          <Link>Trending</Link>
+          <Link>Trending🔥</Link>
           <Link>Feedback</Link>
         </Section2>
         <Section3>

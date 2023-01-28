@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Navbar from "../components/Navbar";
 import PhotoMeme from "../components/PhotoMeme";
@@ -28,6 +29,7 @@ const ToggleContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 50px;
+  position: relative;
 `;
 
 const ToggleWrapper = styled.div`
@@ -38,6 +40,32 @@ const ToggleWrapper = styled.div`
   border: 2px solid #373737;
   padding: 5px;
   border-radius: 25px;
+`;
+
+const GenerateButtonContainer = styled.div`
+  display: flex;
+  margin-right: auto;
+  align-items: center;
+  position: absolute;
+  right: 85%;
+`;
+
+const GenerateButton = styled.button`
+  width: auto;
+  height: 50px;
+  background-color: #28a745;
+  border: none;
+  color: white;
+  font-size: larger;
+  cursor: pointer;
+  border-radius: 0.2rem;
+  font-weight: 600;
+  box-shadow: 0px 5px 5px -5px #28a745;
+  transition: all ease 0.3s;
+  &:hover {
+    background-color: #145322;
+    color: #7f7f7f;
+  }
 `;
 
 const Photo = styled.div`
@@ -81,6 +109,9 @@ const Button = styled.button`
 `;
 
 const Home = () => {
+  //for redirecting on generate meme page
+  const navigate = useNavigate();
+
   //function for setting toggle Active
   const [isActive, setIsActive] = useState(true);
   const handleClick = () => {
@@ -123,6 +154,11 @@ const Home = () => {
         <Navbar value={search} />
         <Wrapper>
           <ToggleContainer>
+            <GenerateButtonContainer>
+              <GenerateButton onClick={() => navigate("/generate")}>
+                Generate Meme!
+              </GenerateButton>
+            </GenerateButtonContainer>
             <ToggleWrapper>
               {isActive ? (
                 <>

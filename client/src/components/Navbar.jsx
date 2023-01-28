@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Search } from "@mui/icons-material";
 import { mobile } from "../resources/mobile";
@@ -49,6 +50,7 @@ const SearchContainer = styled.div`
   width: 50%;
   justify-content: space-around;
   border-radius: 20px;
+  display: ${(props) => props.dontdisplay};
   ${mobile({ width: "80%" })}
 `;
 
@@ -71,6 +73,8 @@ const Input = styled.input`
 `;
 
 const Navbar = (props) => {
+  const navigate = useNavigate();
+
   const searchHandler = (e) => {
     props.value(e.target.value);
   };
@@ -79,10 +83,10 @@ const Navbar = (props) => {
       <Container>
         <Wrapper>
           <Left>
-            <Logo>All India Meme</Logo>
+            <Logo onClick={() => navigate("/")}>All India Meme</Logo>
           </Left>
           <Right>
-            <SearchContainer>
+            <SearchContainer dontdisplay={props.dontdisplay}>
               <Input placeholder="Search" onChange={searchHandler}></Input>
               <Search style={{ cursor: "pointer" }} />
             </SearchContainer>

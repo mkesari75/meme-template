@@ -15,9 +15,13 @@
     "js-file-download": "^0.4.12",
     "react": "^18.2.0",
     "react-alert": "^7.0.3",
+    "react-component-export-image": "^1.0.6",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.5",
     "react-player": "^2.10.1",
+    "react-router-dom": "^6.6.1",
     "react-scripts": "5.0.1",
+    "react-share": "^4.4.1",
     "react-toastify": "^9.0.8",
     "styled-components": "^5.3.5",
     "web-vitals": "^2.1.4"
