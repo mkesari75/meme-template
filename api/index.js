@@ -32,6 +32,7 @@ const MemeSchema = new mongoose.Schema(
     tags: [String],
     likes: Number,
     downloads: Number,
+    shares: Number,
   },
   { timestamp: true }
 );
@@ -40,10 +41,12 @@ const MemeSchema = new mongoose.Schema(
 const photoMeme = mongoose.model("photoMeme", MemeSchema);
 const videoMeme = mongoose.model("videoMeme", MemeSchema);
 
+//root
 app.get("/", (req, res) => {
   res.send("Welcome to Server of All India Meme");
 });
 
+//for finding meme from db along with query
 app.get("/photo", (req, res) => {
   const { q } = req.query;
   photoMeme
@@ -60,6 +63,7 @@ app.get("/photo", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+//for updating photo meme downloads counter
 app.post("/photoupdatedownload", (req, res) => {
   const id = req.body.id;
   try {
@@ -75,6 +79,7 @@ app.post("/photoupdatedownload", (req, res) => {
   }
 });
 
+//for updating photo likes counter
 app.post("/photoupdatelikes", (req, res) => {
   const id = req.body.id;
   const like = req.body.likes;
@@ -91,6 +96,74 @@ app.post("/photoupdatelikes", (req, res) => {
   }
 });
 
+//for updating photomeme shares counter in db
+app.post("/photoupdateshares", (req, res) => {
+  const id = req.body.id;
+  console.log(id);
+  try {
+    photoMeme.updateOne({ _id: id }, { $inc: { shares: 1 } }, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.end();
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//for updating video downloads counter in db
+app.post("/videoupdatedownload", (req, res) => {
+  const id = req.body.id;
+  try {
+    videooMeme.updateOne({ _id: id }, { $inc: { downloads: 1 } }, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.end();
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//for updating video likes counter in db
+app.post("/videooupdatelikes", (req, res) => {
+  const id = req.body.id;
+  const like = req.body.likes;
+  try {
+    videoMeme.updateOne({ id }, { $inc: { likes: like } }, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.end();
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//for updating shares counter in db
+app.post("/videoupdateshares", (req, res) => {
+  const id = req.body.id;
+  console.log(id);
+  try {
+    videoMeme.updateOne({ _id: id }, { $inc: { shares: 1 } }, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.end();
+      }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+//for finding meme from db along with query
 app.get("/video", (req, res) => {
   const { q } = req.query;
   videoMeme
@@ -125,13 +198,6 @@ app.get("/getsharedvideomeme", (req, res) => {
   const newid = mongoose.Types.ObjectId(req.query.id.trim());
   videoMeme.find({ _id: newid }).then((meme) => res.json(meme));
   console.log(newid);
-});
-
-app.get("/test", (req, res) => {
-  mongoose
-    .Collection("photoMeme")
-    .find({ _id: "63a0601f547767f9e4618f80" })
-    .then((meme) => res.json(meme));
 });
 
 app.listen(process.env.PORT || 4000, () => {

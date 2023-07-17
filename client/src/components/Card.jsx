@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -8,7 +8,8 @@ import axios from "axios";
 import fileDownload from "js-file-download";
 import { mobile } from "../resources/mobile";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Tooltip from "rc-tooltip";
+import "rc-tooltip/assets/bootstrap.css";
 import {
   FacebookShareButton,
   FacebookIcon,
@@ -150,15 +151,19 @@ const Card = (props) => {
   };
 
   //for handling share count
-  let [shareCount, setShareCount] = useState(0);
-  const handleShareCount = () => {
+  let [shareCount, setShareCount] = useState(1);
+  const handleShareCount = (id) => {
     setShareCount((prev) => prev + 1);
+    try {
+      axios.post("http://localhost:4000/photoupdateshares", {
+        id: id,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
-  useEffect(() => {
-    console.log(shareCount);
-  }, [shareCount]);
 
-  //for updating like countin db
+  //for updating like counting db
   const update = (id) => {
     clicked ? (
       <>
@@ -216,7 +221,7 @@ const Card = (props) => {
   const url = "http://localhost:3000/getsharedphotomeme?id=" + props.id;
   return (
     <>
-      <Container>
+      <Container key={props.id}>
         <ShareContainer displayIcon={displayShareIcon}>
           <Share>
             <TwitterShareButton
@@ -227,7 +232,7 @@ const Card = (props) => {
                 <TwitterIcon
                   size={40}
                   round={true}
-                  onClick={handleShareCount}
+                  onClick={() => handleShareCount(props.id)}
                 />
               </ShareIcon>
             </TwitterShareButton>
@@ -240,7 +245,7 @@ const Card = (props) => {
                 <WhatsappIcon
                   size={40}
                   round={true}
-                  onClick={handleShareCount}
+                  onClick={() => handleShareCount(props.id)}
                 />
               </ShareIcon>
             </WhatsappShareButton>
@@ -250,14 +255,14 @@ const Card = (props) => {
                 <FacebookIcon
                   size={40}
                   round={true}
-                  onClick={handleShareCount}
+                  onClick={() => handleShareCount(props.id)}
                 />
               </ShareIcon>
             </FacebookShareButton>
           </Share>
         </ShareContainer>
 
-        <Image key={props.id} src={props.url} alt={props.title}></Image>
+        <Image src={props.url} alt={props.title}></Image>
         <Tags>
           {props.tags.map((tag) => (
             <Tag>{"#" + tag}</Tag>
@@ -266,43 +271,61 @@ const Card = (props) => {
         <Details>
           <Title>{props.title}</Title>
           <Icons>
-            <Icon
-              hover="#d90429"
-              borderColor="#d90429"
-              color={clicked ? "#d90429" : "white"}
-              onClick={() => {
-                toggle();
-                update(props.id);
-              }}
+            <Tooltip
+              placement="left"
+              overlay="Like"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
             >
-              {clicked ? (
-                <FavoriteIcon style={{ color: "#d90429" }} />
-              ) : (
-                <FavoriteBorderOutlinedIcon />
-              )}
-            </Icon>
-            <Icon
-              hover="#0096c7"
-              borderColor="#0096c7"
-              style={{ marginLeft: "10px" }}
-              onClick={() =>
-                handleDownload(props.url, props.title + ".jpg", props.id)
-              }
-            >
-              <ArrowDownwardIcon />
-            </Icon>
-            <Icon
-              hover="#04D932"
-              borderColor="#04D932"
-              style={{ marginLeft: "10px" }}
-            >
-              <IoIosShareAlt
-                style={{ scale: "1.5" }}
+              <Icon
+                hover="#d90429"
+                borderColor="#d90429"
+                color={clicked ? "#d90429" : "white"}
                 onClick={() => {
-                  handleDisplay();
+                  toggle();
+                  update(props.id);
                 }}
-              />
-            </Icon>
+              >
+                {clicked ? (
+                  <FavoriteIcon style={{ color: "#d90429" }} />
+                ) : (
+                  <FavoriteBorderOutlinedIcon />
+                )}
+              </Icon>
+            </Tooltip>
+            <Tooltip
+              placement="top"
+              overlay="Download"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
+            >
+              <Icon
+                hover="#0096c7"
+                borderColor="#0096c7"
+                style={{ marginLeft: "10px" }}
+                onClick={() =>
+                  handleDownload(props.url, props.title + ".jpg", props.id)
+                }
+              >
+                <ArrowDownwardIcon />
+              </Icon>
+            </Tooltip>
+            <Tooltip
+              placement="right"
+              overlay="Share"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
+            >
+              <Icon
+                hover="#04D932"
+                borderColor="#04D932"
+                style={{ marginLeft: "10px" }}
+              >
+                <IoIosShareAlt
+                  style={{ scale: "1.5" }}
+                  onClick={() => {
+                    handleDisplay();
+                  }}
+                />
+              </Icon>
+            </Tooltip>
           </Icons>
         </Details>
 
@@ -325,10 +348,11 @@ const Card = (props) => {
             type="share"
             style={{ marginLeft: "10px", color: "#04D932" }}
           >
-            {Math.abs(downloads) > 999
-              ? Math.sign(downloads) * (Math.abs(downloads) / 1000).toFixed(1) +
+            {Math.abs(props.shares) > 999
+              ? Math.sign(props.shares) *
+                  (Math.abs(props.shares) / 1000).toFixed(1) +
                 "k"
-              : Math.sign(downloads) * Math.abs(downloads)}
+              : Math.sign(props.shares) * Math.abs(props.shares)}
           </Counter>
         </CounterContainer>
         <ToastContainer />

@@ -6,7 +6,7 @@ import PhotoMeme from "../components/PhotoMeme";
 import VideoMeme from "../components/VideoMeme";
 import Footer from "../components/Footer";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-
+import { mobile } from "../resources/mobile";
 //Main css
 const Container = styled.div`
   height: auto;
@@ -48,6 +48,7 @@ const GenerateButtonContainer = styled.div`
   align-items: center;
   position: absolute;
   right: 85%;
+  ${mobile({ right: "70%" })}
 `;
 
 const GenerateButton = styled.button`
@@ -57,6 +58,7 @@ const GenerateButton = styled.button`
   border: none;
   color: white;
   font-size: larger;
+  ${mobile({ fontWeight: 200, fontSize: "auto" })}
   cursor: pointer;
   border-radius: 0.2rem;
   font-weight: 600;

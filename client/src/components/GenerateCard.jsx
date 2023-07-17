@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { FiEdit2 } from "react-icons/fi";
 import { mobile } from "../resources/mobile";
 import { useNavigate } from "react-router-dom";
+import Tooltip from "rc-tooltip";
+import "rc-tooltip/assets/bootstrap.css";
 
 const Container = styled.div`
   position: relative;
@@ -63,14 +65,20 @@ const GenerateCard = (props) => {
         <Details>
           <Title>{props.title}</Title>
           <Icons>
-            <Icon
-              hover="#04D932"
-              borderColor="#04D932"
-              style={{ marginLeft: "10px" }}
-              onClick={() => console.log("clicked")}
+            <Tooltip
+              placement="left"
+              overlay="Edit"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
             >
-              <FiEdit2 onClick={() => navigate(`/edit?url=${props.url}`)} />
-            </Icon>
+              <Icon
+                hover="#04D932"
+                borderColor="#04D932"
+                style={{ marginLeft: "10px" }}
+                onClick={() => console.log("clicked")}
+              >
+                <FiEdit2 onClick={() => navigate(`/edit?url=${props.url}`)} />
+              </Icon>
+            </Tooltip>
           </Icons>
         </Details>
       </Container>

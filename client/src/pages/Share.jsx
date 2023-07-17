@@ -50,6 +50,7 @@ const Share = () => {
                 tags={meme.tags}
                 likes={meme.likes}
                 downloads={meme.downloads}
+                shares={meme.shares}
               />
             );
           })}

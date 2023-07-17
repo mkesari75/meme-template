@@ -65,15 +65,16 @@ const PhotoMeme = (props) => {
           ) : (
             //main container
             <>
-              {photo.slice(0, props.photoShowMore).map((meme) => (
+              {photo.slice(0, props.photoShowMore).map((meme, index) => (
                 <Card
-                  key={meme._id}
+                  key={index}
                   id={meme._id}
                   url={meme.url}
                   title={meme.title}
                   tags={meme.tags}
                   likes={meme.likes}
                   downloads={meme.downloads}
+                  shares={meme.shares}
                 />
               ))}
             </>

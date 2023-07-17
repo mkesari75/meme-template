@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -10,6 +10,8 @@ import ReactPlayer from "react-player";
 import { mobile } from "../resources/mobile";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Tooltip from "rc-tooltip";
+import "rc-tooltip/assets/bootstrap.css";
 import {
   FacebookShareButton,
   FacebookIcon,
@@ -134,14 +136,59 @@ const VideoCard = (props) => {
   const toggle = () => {
     setClicked(!clicked);
   };
+
+  //getting likes and downloads count from db
+  const [likes, setLikes] = useState(props.likes);
+  const [downloads, setDownloads] = useState(props.downloads);
+
+  //for setting the share icon and toggling it to display on click of the shareicon
+  const [displayShareIcon, setDisplayShareIcon] = useState("none");
+  const [toggleShareIcon, setToggleShareIcon] = useState(true);
+
+  //for handling share icon i.e whatsapp, facebook
+  const handleDisplay = () => {
+    setToggleShareIcon(!toggleShareIcon);
+    toggleShareIcon ? setDisplayShareIcon("") : setDisplayShareIcon("none");
+  };
+
+  //for updating like counting db
+  const update = (id) => {
+    clicked ? (
+      <>
+        {setLikes((prev) => prev - 1)}&&
+        {axios.post("http://localhost:4000/videoupdatelikes", {
+          id: id,
+          likes: -1,
+        })}
+      </>
+    ) : (
+      <>
+        {setLikes((prev) => prev + 1)}&&
+        {axios.post("http://localhost:4000/videoupdatelikes", {
+          id: id,
+          likes: 1,
+        })}
+      </>
+    );
+  };
+
   //Downloading function
-  const handleDownload = (url, filename) => {
+  const handleDownload = (url, filename, id) => {
     axios
       .get(url, {
         responseType: "blob",
       })
       .then((res) => {
         fileDownload(res.data, filename);
+        //updating the downloads in db
+        setDownloads((prev) => prev + 1);
+        try {
+          axios.post("http://localhost:4000/videoupdatedownload", {
+            id: id,
+          });
+        } catch (err) {
+          console.log(err);
+        }
         toast.success("Downloaded Successfully!", {
           position: "bottom-right",
           theme: "colored",
@@ -158,24 +205,18 @@ const VideoCard = (props) => {
       });
   };
 
-  //for setting the share icon and toggling it to display on click of the shareicon
-  const [displayShareIcon, setDisplayShareIcon] = useState("none");
-  const [toggleShareIcon, setToggleShareIcon] = useState(true);
-
-  //for handling share icon i.e whatsapp, facebook
-  const handleDisplay = () => {
-    setToggleShareIcon(!toggleShareIcon);
-    toggleShareIcon ? setDisplayShareIcon("") : setDisplayShareIcon("none");
-  };
-
   //for handling share count
   let [shareCount, setShareCount] = useState(0);
-  const handleShareCount = () => {
+  const handleShareCount = (id) => {
     setShareCount((prev) => prev + 1);
+    try {
+      axios.post("http://localhost:4000/videoupdateshares", {
+        id: id,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
-  useEffect(() => {
-    console.log(shareCount);
-  }, [shareCount]);
 
   const url = "http://localhost:3000/getsharedvideomeme?id=" + props.id;
   return (
@@ -191,7 +232,7 @@ const VideoCard = (props) => {
                 <TwitterIcon
                   size={40}
                   round={true}
-                  onClick={handleShareCount}
+                  onClick={() => handleShareCount(props.id)}
                 />
               </ShareIcon>
             </TwitterShareButton>
@@ -204,7 +245,7 @@ const VideoCard = (props) => {
                 <WhatsappIcon
                   size={40}
                   round={true}
-                  onClick={handleShareCount}
+                  onClick={() => handleShareCount(props.id)}
                 />
               </ShareIcon>
             </WhatsappShareButton>
@@ -214,7 +255,7 @@ const VideoCard = (props) => {
                 <FacebookIcon
                   size={40}
                   round={true}
-                  onClick={handleShareCount}
+                  onClick={() => handleShareCount(props.id)}
                 />
               </ShareIcon>
             </FacebookShareButton>
@@ -232,68 +273,88 @@ const VideoCard = (props) => {
         <Details>
           <Title>{props.title}</Title>
           <Icons>
-            <Icon
-              hover="#d90429"
-              borderColor="#d90429"
-              color={clicked ? "#d90429" : "white"}
-              onClick={toggle}
+            <Tooltip
+              placement="left"
+              overlay="Like"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
             >
-              {clicked ? (
-                <FavoriteIcon style={{ color: "#d90429" }} />
-              ) : (
-                <FavoriteBorderOutlinedIcon />
-              )}
-            </Icon>
-            <Icon
-              hover="#0096c7"
-              borderColor="#0096c7"
-              style={{ marginLeft: "10px" }}
-              onClick={() => handleDownload(props.url, props.title + ".mp4")}
-            >
-              <ArrowDownwardIcon />
-            </Icon>
-            <Icon
-              hover="#04D932"
-              borderColor="#04D932"
-              style={{ marginLeft: "10px" }}
-            >
-              <IoIosShareAlt
-                style={{ scale: "1.5" }}
+              <Icon
+                hover="#d90429"
+                borderColor="#d90429"
+                color={clicked ? "#d90429" : "white"}
                 onClick={() => {
-                  handleDisplay();
+                  toggle();
+                  update(props.id);
                 }}
-              />
-            </Icon>
+              >
+                {clicked ? (
+                  <FavoriteIcon style={{ color: "#d90429" }} />
+                ) : (
+                  <FavoriteBorderOutlinedIcon />
+                )}
+              </Icon>
+            </Tooltip>
+            <Tooltip
+              placement="top"
+              overlay="Download"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
+            >
+              <Icon
+                hover="#0096c7"
+                borderColor="#0096c7"
+                style={{ marginLeft: "10px" }}
+                onClick={() =>
+                  handleDownload(props.url, props.title + ".mp4", props.id)
+                }
+              >
+                <ArrowDownwardIcon />
+              </Icon>
+            </Tooltip>
+            <Tooltip
+              placement="right"
+              overlay="Share"
+              arrowContent={<div className="rc-tooltip-arrow-inner"></div>}
+            >
+              <Icon
+                hover="#04D932"
+                borderColor="#04D932"
+                style={{ marginLeft: "10px" }}
+              >
+                <IoIosShareAlt
+                  style={{ scale: "1.5" }}
+                  onClick={() => {
+                    handleDisplay();
+                  }}
+                />
+              </Icon>
+            </Tooltip>
           </Icons>
         </Details>
 
         <CounterContainer>
           <Counter type="likes" style={{ color: "#d90429" }}>
-            {Math.abs(props.likes) > 999
-              ? Math.sign(props.likes) *
-                  (Math.abs(props.likes) / 1000).toFixed(1) +
-                "k"
-              : Math.sign(props.likes) * Math.abs(props.likes)}
+            {Math.abs(likes) > 999
+              ? Math.sign(likes) * (Math.abs(likes) / 1000).toFixed(1) + "k"
+              : Math.sign(likes) * Math.abs(likes)}
           </Counter>
           <Counter
             type="download"
             style={{ marginLeft: "10px", color: "#0096c7" }}
           >
-            {Math.abs(props.downloads) > 999
-              ? Math.sign(props.downloads) *
-                  (Math.abs(props.downloads) / 1000).toFixed(1) +
+            {Math.abs(downloads) > 999
+              ? Math.sign(downloads) * (Math.abs(downloads) / 1000).toFixed(1) +
                 "k"
-              : Math.sign(props.downloads) * Math.abs(props.downloads)}
+              : Math.sign(downloads) * Math.abs(downloads)}
           </Counter>
           <Counter
             type="share"
             style={{ marginLeft: "10px", color: "#04D932" }}
           >
-            {Math.abs(props.downloads) > 999
-              ? Math.sign(props.downloads) *
-                  (Math.abs(props.downloads) / 1000).toFixed(1) +
+            {Math.abs(props.shares) > 999
+              ? Math.sign(props.shares) *
+                  (Math.abs(props.shares) / 1000).toFixed(1) +
                 "k"
-              : Math.sign(props.downloads) * Math.abs(props.downloads)}
+              : Math.sign(props.shares) * Math.abs(props.shares)}
           </Counter>
         </CounterContainer>
 
